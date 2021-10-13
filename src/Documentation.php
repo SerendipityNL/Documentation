@@ -2,71 +2,112 @@
 
 namespace TrafficSupply\Documentation;
 
-class Documentation {
+class Documentation
+{
 
-	private $pages 	   = [];
-	private $directory = '';
-	private $main_page = 'home';
+    private $pages     = [];
+    private $directory = '';
+    private $main_directory = 'home';
+    private $code_directory = 'code';
 
-	public function __construct( $settings ) {
+    public function __construct( $settings )
+    {
 
-		if ( isset($settings['directory']) ) {
-			$this->directory = $settings['directory'];
-		}
+        if ( isset( $settings['directory'] ) ) {
+            $this->directory = $settings['directory'];
+        }
 
-		if ( isset($settings['main_page']) ) {
-			$this->main_page = $settings['main_page'];
-		}
+        if ( isset( $settings['main_directory'] ) ) {
+            $this->main_directory = $settings['main_directory'];
+        }
 
-		$this->setMainPage();
+        $this->setMainPage();
 
-		if ( ! $settings['prevent_auto_parse'] ?? true ) {
-			$this->parse();
-		}
+        if ( ! $settings['prevent_auto_parse'] ?? true ) {
+            $this->parse();
+        }
 
-		return $this;
+        return $this;
 
-	}
+    }
 
-	public function parse() {
+    public function parse()
+    {
+        $this->parseIndexes();
 
-		$files = glob($this->directory.'/**/index.php');
+        $this->parseSubFiles();
+    }
 
-		foreach ( $files as $file ) {
-			$directory_name = preg_replace('('.$this->directory.'/|/index.php)', '', $file);
+    private function parseIndexes()
+    {
 
-			if ( $directory_name === $this->main_page ) {
-				continue;
-			}
+        $files = glob( $this->directory.'/**/index.php' );
 
-			$page = [
-				'folder' => $directory_name,
-				'title'  => $this->directory_to_title($directory_name),
-			];
+        foreach ( $files as $file ) {
 
-			$this->addPage($page);
-		}
-	}
+            $is_matching = preg_match( '~^'.$this->directory.'/(?<directory>(?!'.$this->code_directory.'|'.$this->main_directory.').*)/index.php$~', $file, $matches );
 
-	private function addPage($page) {
-		$this->pages[$page['folder']] = $page;
-	}
+            if ( ! $is_matching ) {
+            	continue;
+            }
 
-	public function getPages() {
-		return $this->pages;
-	}
+            $page = [
+                'directory' => $matches['directory'],
+                'title'     => $this->directory_to_title( $matches['directory'] ),
+                'files'     => [],
+            ];
 
-	private function setMainPage() {
-		$page = [
-			'folder' => $this->main_page,
-			'title'  => $this->directory_to_title($this->main_page),
-		];
+            $this->addPage( $page );
+        }
 
-		$this->addPage($page);
-	}
+    }
 
-	private function directory_to_title($directory) {
-    	return ucwords(str_replace('_', ' ', $directory));
-	}
+    private function parseSubFiles()
+    {
+
+        foreach ( $this->getPages() as &$page ) {
+
+            $files = glob( $this->directory.'/'.$page['directory'].'/_*.php' );
+
+            foreach ( $files as $file ) {
+
+                preg_match( '~^'.$this->directory.'/'.$page['directory'].'/_(?<file>.*).php$~', $file, $matches );
+
+                $this->addSubFile( $page['directory'], $matches['file'] );
+            }
+
+        }
+
+    }
+
+    private function addPage( $page )
+    {
+        $this->pages[$page['directory']] = $page;
+    }
+
+    public function getPages()
+    {
+        return $this->pages;
+    }
+
+    private function addSubFile( $directory, $file )
+    {
+        $this->pages[$directory]['files'][] = $file;
+    }
+
+    private function setMainPage()
+    {
+        $page = [
+            'directory' => $this->main_directory,
+            'title'     => $this->directory_to_title( $this->main_directory ),
+        ];
+
+        $this->addPage( $page );
+    }
+
+    private function directory_to_title( $directory )
+    {
+        return ucwords( str_replace( '_', ' ', $directory ) );
+    }
 
 }
