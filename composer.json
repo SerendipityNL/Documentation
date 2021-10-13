@@ -1,0 +1,18 @@
+{
+    "name": "trafficsupply/documentation",
+    "description": "Create documentation from all files in a folder",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Douwe de Haan",
+            "email": "rinzedouwedehaan@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "TrafficSupply\\Documentation\\": "src/"
+        }
+    },
+    "require": {}
+}
