@@ -14,5 +14,7 @@
             "TrafficSupply\\Documentation\\": "src/"
         }
     },
-    "require": {}
+    "require": {
+        "league/flysystem": "*"
+    }
 }
