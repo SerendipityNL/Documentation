@@ -2,19 +2,15 @@
 
 namespace TrafficSupply\Documentation;
 
+use TrafficSupply\Documentation\Documentation;
+
 class Parser
 {
 
     private $pages = [];
 
-    private $directory;
-    private $home_directory;
-    private $code_directory;
-
-    public function run($directory = 'documentation', $home_directory = 'home', $code_directory = 'code') {
-    	$this->directory      = $directory;
-        $this->home_directory = $home_directory;
-        $this->code_directory = $code_directory;
+    public function run()
+    {
 
         $this->setMainPage();
 
@@ -28,11 +24,11 @@ class Parser
     private function parseIndexes()
     {
 
-        $files = glob( $this->directory.'/**/index.php' );
+        $files = glob( Documentation::$directory.'/*/index.php' );
 
         foreach ( $files as $file ) {
 
-            $is_matching = preg_match( '~^'.$this->directory.'/(?<directory>(?!'.$this->code_directory.'|'.$this->home_directory.').*)/index.php$~', $file, $matches );
+            $is_matching = preg_match( '~^'.Documentation::$directory.'/(?<directory>(?!'.Documentation::$code_directory.'|'.Documentation::$home_directory.').*)/index.php$~', $file, $matches );
 
             if ( ! $is_matching ) {
                 continue;
@@ -40,7 +36,7 @@ class Parser
 
             $page = [
                 'directory' => $matches['directory'],
-                'title'     => self::directory_to_title( $matches['directory'] ),
+                'title'     => $this->directory_to_title( $matches['directory'] ),
                 'files'     => [],
             ];
 
@@ -54,11 +50,11 @@ class Parser
 
         foreach ( $this->getPages() as $page ) {
 
-            $files = glob( $this->directory.'/'.$page['directory'].'/_*.php' );
+            $files = glob( Documentation::$directory.'/'.$page['directory'].'/_*.php' );
 
             foreach ( $files as $file ) {
 
-                preg_match( '~^'.$this->directory.'/'.$page['directory'].'/_(?<file>.*).php$~', $file, $matches );
+                preg_match( '~^'.Documentation::$directory.'/'.$page['directory'].'/_(?<file>.*).php$~', $file, $matches );
 
                 $this->addSubFile( $page['directory'], $matches['file'] );
             }
@@ -79,14 +75,17 @@ class Parser
 
     private function addSubFile( $directory, $file )
     {
-        $this->pages[$directory]['files'][] = $file;
+        $this->pages[$directory]['files'][] = [
+            'title' => $this->directory_to_title( $file ),
+            'file'  => $file,
+        ];
     }
 
     private function setMainPage()
     {
         $page = [
-            'directory' => $this->home_directory,
-            'title'     => $this->directory_to_title( $this->home_directory ),
+            'directory' => Documentation::$home_directory,
+            'title'     => $this->directory_to_title( Documentation::$home_directory ),
         ];
 
         $this->addPage( $page );
