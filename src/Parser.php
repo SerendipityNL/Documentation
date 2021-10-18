@@ -2,6 +2,8 @@
 
 namespace TrafficSupply\Documentation;
 
+use League\Flysystem\Filesystem;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use TrafficSupply\Documentation\Documentation;
 
 class Parser
@@ -24,15 +26,24 @@ class Parser
     private function parseIndexes()
     {
 
-        $files = glob( Documentation::$directory.'/*/index.php' );
+        $adapter    = new LocalFilesystemAdapter( Documentation::$directory );
+        $filesystem = new Filesystem( $adapter );
+
+        $files = $filesystem->listContents( '/', true )
+                            ->filter( function ( $attributes ) {
+
+                                if ( $attributes->isDir() ) {
+                                    return false;
+                                }
+
+                                return preg_match( '~^(?<directory>(?!'.Documentation::$code_directory.'|'.Documentation::$home_directory.').*)/index.php$~', $attributes->path() );
+                            } )
+                            ->sortByPath()
+                            ->toArray();
 
         foreach ( $files as $file ) {
 
-            $is_matching = preg_match( '~^'.Documentation::$directory.'/(?<directory>(?!'.Documentation::$code_directory.'|'.Documentation::$home_directory.').*)/index.php$~', $file, $matches );
-
-            if ( ! $is_matching ) {
-                continue;
-            }
+            preg_match( '~^(?<directory>(?!'.Documentation::$code_directory.'|'.Documentation::$home_directory.').*)/index.php$~', $file->path(), $matches );
 
             $page = [
                 'directory' => $matches['directory'],
@@ -50,11 +61,24 @@ class Parser
 
         foreach ( $this->getPages() as $page ) {
 
-            $files = glob( Documentation::$directory.'/'.$page['directory'].'/_*.php' );
+            $adapter    = new LocalFilesystemAdapter( Documentation::$directory.'/'.$page['directory'] );
+            $filesystem = new Filesystem( $adapter );
+
+            $files = $filesystem->listContents( '/', true )
+                                ->filter( function ( $attributes ) {
+
+                                    if ( $attributes->isDir() ) {
+                                        return false;
+                                    }
+
+                                    return preg_match( '~^_.*.php$~', $attributes->path() );
+                                } )
+                                ->sortByPath()
+                                ->toArray();
 
             foreach ( $files as $file ) {
 
-                preg_match( '~^'.Documentation::$directory.'/'.$page['directory'].'/_(?<file>.*).php$~', $file, $matches );
+                preg_match( '~^_(?<file>.*).php$~', $file->path(), $matches );
 
                 $this->addSubFile( $page['directory'], $matches['file'] );
             }
