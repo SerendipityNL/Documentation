@@ -21,7 +21,7 @@ class Renderer
 
                 foreach ( $page['files'] as $file ) {
                     $response .= '<li>';
-                    $response .= '<a href="'.$file['file'].'">'.$file['title'].'</a>';
+                    $response .= '<a href="#'.$file['file'].'">'.$file['title'].'</a>';
                     $response .= '</li>';
                 }
 
@@ -36,15 +36,20 @@ class Renderer
         return $response;
     }
 
-    public function activePage( $pages = [] )
+    public function activePage( $active_page )
     {
 
         ob_start();
 
         include Documentation::$directory.'/'.Documentation::$active_page.'/'.'index.php';
 
-        foreach ( $pages[Documentation::$active_page]['files'] as $file ) {
-            include Documentation::$directory.'/'.Documentation::$active_page.'/'.'_'.$file['file'].'.php';
+        if ( $active_page['files'] ) {
+
+            foreach ( $active_page['files'] as $file ) {
+                echo '<h2 id="'.$file['file'].'">'.$file['title'].'</h2>';
+                include Documentation::$directory.'/'.Documentation::$active_page.'/'.'_'.$file['file'].'.php';
+            }
+
         }
 
         $contents = ob_get_clean();
