@@ -20,6 +20,8 @@ class Parser
 
         $this->parseSubFiles();
 
+        $this->sortSubFiles();
+
         return $this;
     }
 
@@ -38,7 +40,6 @@ class Parser
 
                                 return preg_match( '~^(?<directory>(?!'.Documentation::$code_directory.'|'.Documentation::$home_directory.').*)/index.php$~', $attributes->path() );
                             } )
-                            ->sortByPath()
                             ->toArray();
 
         foreach ( $files as $file ) {
@@ -73,7 +74,6 @@ class Parser
 
                                     return preg_match( '~^_.*.php$~', $attributes->path() );
                                 } )
-                                ->sortByPath()
                                 ->toArray();
 
             foreach ( $files as $file ) {
@@ -100,7 +100,7 @@ class Parser
     private function addSubFile( $directory, $file )
     {
         $this->pages[$directory]['files'][] = [
-            'title' => $this->directory_to_title( $file ),
+            'title' => $this->file_to_title( $file ),
             'file'  => $file,
         ];
     }
@@ -110,14 +110,55 @@ class Parser
         $page = [
             'directory' => Documentation::$home_directory,
             'title'     => $this->directory_to_title( Documentation::$home_directory ),
+            'files'     => [],
         ];
 
         $this->addPage( $page );
     }
 
+    private function sortSubFiles()
+    {
+        $pages = $this->getPages();
+
+        foreach ( $pages as $page ) {
+
+            if ( ! $page['files'] ) {
+                continue;
+            }
+
+            $sorted_files = [];
+
+            $sub_files = array_column( $page['files'], 'title', 'file' );
+
+            $file_names = array_keys( $sub_files );
+
+            natcasesort( $file_names );
+
+            foreach ( $file_names as $sorted_file_name ) {
+                $sorted_files[] = [
+                    'title' => $sub_files[$sorted_file_name],
+                    'file'  => $sorted_file_name,
+                ];
+            }
+
+            $this->setSubFiles( $page['directory'], $sorted_files );
+        }
+
+    }
+
+    private function setSubFiles( $directory, $subFiles )
+    {
+        $this->pages[$directory]['files'] = $subFiles;
+    }
+
     private function directory_to_title( $directory )
     {
         return ucwords( str_replace( '_', ' ', $directory ) );
+    }
+
+    private function file_to_title( $file )
+    {
+        return ucfirst( str_replace( '_', ' ', $file ) );
     }
 
 }

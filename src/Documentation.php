@@ -52,7 +52,14 @@ class Documentation
     public function renderActivePage()
     {
 
-        return $this->getRenderer()->activePage( $this->pages, self::$active_page );
+        $active_page = $this->getActivePage();
+
+        return $this->getRenderer()->activePage( $active_page );
+    }
+
+    public function getActivePage()
+    {
+        return $this->pages[self::$active_page];
     }
 
     private function getRenderer()
