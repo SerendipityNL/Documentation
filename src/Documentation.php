@@ -10,10 +10,10 @@ class Documentation
 
     private $pages = [];
 
-    public static $directory      = '';
-    public static $home_directory = 'home';
-    public static $code_directory = 'code';
-    public static $active_page    = 'home';
+    public static $directory        = '';
+    public static $home_directory   = 'home';
+    public static $code_directory   = 'code';
+    public static $active_directory = 'home';
 
     private $renderer;
 
@@ -28,7 +28,7 @@ class Documentation
             self::$home_directory = $settings['home_directory'];
         }
 
-        self::$active_page = $settings['active_page'] ?? $home_directory;
+        self::$active_directory = $settings['active_page'] ?? $home_directory;
 
         if ( ! ( $settings['prevent_auto_parse'] ?? false ) ) {
             $this->pages = ( new Parser() )->run()->getPages();
@@ -46,7 +46,7 @@ class Documentation
     public function renderTableOfContents()
     {
 
-        return $this->getRenderer()->tableOfContents( $this->pages, self::$active_page );
+        return $this->getRenderer()->tableOfContents( $this->pages );
     }
 
     public function renderActivePage()
@@ -59,7 +59,7 @@ class Documentation
 
     public function getActivePage()
     {
-        return $this->pages[self::$active_page];
+        return $this->pages[self::$active_directory];
     }
 
     private function getRenderer()

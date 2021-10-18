@@ -16,6 +16,6 @@
         }
     },
     "require": {
-        "league/flysystem": "*"
+        "league/flysystem": "^2.3"
     }
 }

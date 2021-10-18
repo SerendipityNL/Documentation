@@ -8,7 +8,7 @@ class Highlighter
     public static function file( $file, $syntax )
     {
 
-        $path = Documentation::$directory.'/'.Documentation::$active_page.'/'.Documentation::$code_directory.'/'.$file;
+        $path = Documentation::$directory.'/'.Documentation::$active_directory.'/'.Documentation::$code_directory.'/'.$file;
 
         if ( ! file_exists( $path ) ) {
             throw new \Exception( 'Code file does not exist' );

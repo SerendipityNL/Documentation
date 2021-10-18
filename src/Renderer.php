@@ -6,13 +6,13 @@ use TrafficSupply\Documentation\Documentation;
 
 class Renderer
 {
-    public function tableOfContents( $pages = [], $active_page = false )
+    public function tableOfContents( $pages = [] )
     {
-        $response = '<ul>';
+        $response = '<ul class="table-of-contents">';
 
         foreach ( $pages as $page ) {
 
-            $response .= '<li '.( $page['directory'] === $active_page ? 'class="active"' : '' ).'>';
+            $response .= '<li '.( $page['directory'] === Documentation::$active_directory ? 'class="active"' : '' ).'>';
             $response .= '<a href="/'.$page['directory'].'">'.$page['title'].'</a>';
 
             if ( isset( $page['files'] ) && count( $page['files'] ) ) {
@@ -21,7 +21,15 @@ class Renderer
 
                 foreach ( $page['files'] as $file ) {
                     $response .= '<li>';
-                    $response .= '<a href="#'.$file['file'].'">'.$file['title'].'</a>';
+
+                    $link = '#'.$file['file'];
+
+                    if ( $page['directory'] !== Documentation::$active_directory ) {
+                        $link = '/'.$page['directory'].$link;
+                    }
+
+                    $response .= '<a href="'.$link.'">'.$file['title'].'</a>';
+
                     $response .= '</li>';
                 }
 
@@ -41,13 +49,13 @@ class Renderer
 
         ob_start();
 
-        include Documentation::$directory.'/'.Documentation::$active_page.'/'.'index.php';
+        include Documentation::$directory.'/'.Documentation::$active_directory.'/'.'index.php';
 
         if ( $active_page['files'] ) {
 
             foreach ( $active_page['files'] as $file ) {
                 echo '<h2 id="'.$file['file'].'">'.$file['title'].'</h2>';
-                include Documentation::$directory.'/'.Documentation::$active_page.'/'.'_'.$file['file'].'.php';
+                include Documentation::$directory.'/'.Documentation::$active_directory.'/'.'_'.$file['file'].'.php';
             }
 
         }
