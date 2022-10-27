@@ -8,40 +8,12 @@ class Renderer
 {
     public function tableOfContents( $pages = [] )
     {
-        $response = '<ul class="table-of-contents">';
+        $active_directory = Documentation::$active_directory;
 
-        foreach ( $pages as $page ) {
-
-            $response .= '<li '.( $page['directory'] === Documentation::$active_directory ? 'class="active"' : '' ).'>';
-            $response .= '<a href="/'.$page['directory'].'">'.$page['title'].'</a>';
-
-            if ( isset( $page['files'] ) && count( $page['files'] ) ) {
-
-                $response .= '<ul>';
-
-                foreach ( $page['files'] as $file ) {
-                    $response .= '<li>';
-
-                    $link = '#'.$file['file'];
-
-                    if ( $page['directory'] !== Documentation::$active_directory ) {
-                        $link = '/'.$page['directory'].$link;
-                    }
-
-                    $response .= '<a href="'.$link.'">'.$file['title'].'</a>';
-
-                    $response .= '</li>';
-                }
-
-                $response .= '</ul>';
-            }
-
-            $response .= '</li>';
-        }
-
-        $response .= '</ul>';
-
-        return $response;
+        return view('menu', [
+            'active_directory' => $active_directory,
+            'pages' => $pages
+        ]);
     }
 
     public function activePage( $active_page )
