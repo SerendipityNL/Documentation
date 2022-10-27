@@ -19,7 +19,6 @@ class Documentation
 
     public function __construct( $settings )
     {
-
         if ( isset( $settings['directory'] ) ) {
             self::$directory = $settings['directory'];
         }
@@ -35,7 +34,6 @@ class Documentation
         }
 
         return $this;
-
     }
 
     public function getPages()
@@ -45,13 +43,11 @@ class Documentation
 
     public function renderTableOfContents()
     {
-
         return $this->getRenderer()->tableOfContents( $this->pages );
     }
 
     public function renderActivePage()
     {
-
         $active_page = $this->getActivePage();
 
         return $this->getRenderer()->activePage( $active_page );
@@ -64,7 +60,6 @@ class Documentation
 
     private function getRenderer()
     {
-
         if ( ! $this->renderer ) {
             $this->renderer = new Renderer();
         }

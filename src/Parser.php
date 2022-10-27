@@ -13,7 +13,6 @@ class Parser
 
     public function run()
     {
-
         $this->setMainPage();
 
         $this->parseIndexes();
@@ -27,7 +26,6 @@ class Parser
 
     private function parseIndexes()
     {
-
         $adapter    = new LocalFilesystemAdapter( Documentation::$directory );
         $filesystem = new Filesystem( $adapter );
 
@@ -54,12 +52,10 @@ class Parser
 
             $this->addPage( $page );
         }
-
     }
 
     private function parseSubFiles()
     {
-
         foreach ( $this->getPages() as $page ) {
 
             $adapter    = new LocalFilesystemAdapter( Documentation::$directory.'/'.$page['directory'] );
@@ -82,9 +78,7 @@ class Parser
 
                 $this->addSubFile( $page['directory'], $matches['file'] );
             }
-
         }
-
     }
 
     public function getPages()

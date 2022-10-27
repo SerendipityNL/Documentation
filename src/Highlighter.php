@@ -4,10 +4,8 @@ namespace TrafficSupply\Documentation;
 
 class Highlighter
 {
-
     public static function file( $file, $syntax )
     {
-
         $path = Documentation::$directory.'/'.Documentation::$active_directory.'/'.Documentation::$code_directory.'/'.$file;
 
         if ( ! file_exists( $path ) ) {
