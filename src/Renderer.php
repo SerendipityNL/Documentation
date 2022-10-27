@@ -18,7 +18,6 @@ class Renderer
 
     public function activePage( $active_page )
     {
-
         ob_start();
 
         include Documentation::$directory.'/'.Documentation::$active_directory.'/'.'index.php';
@@ -26,10 +25,11 @@ class Renderer
         if ( $active_page['files'] ) {
 
             foreach ( $active_page['files'] as $file ) {
+
                 echo '<h2 id="'.$file['file'].'">'.$file['title'].'</h2>';
+
                 include Documentation::$directory.'/'.Documentation::$active_directory.'/'.'_'.$file['file'].'.php';
             }
-
         }
 
         $contents = ob_get_clean();

@@ -5,8 +5,8 @@ function hl( $file, $syntax )
     return \TrafficSupply\Documentation\Highlighter::file( $file, $syntax );
 }
 
-function view($name, $data) {
-
+function view($name, $data)
+{
     $file_path = __DIR__.'/views/'.$name.'.php';
 
     if ( ! is_file($file_path) ) {
